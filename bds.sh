@@ -11,7 +11,7 @@ next() {
     LEN=${#HISTORY[@]}
 
     ((CURRENT_INDEX++))
-    if [ $CURRENT_INDEX -gt $LEN ]; then
+    if [ $CURRENT_INDEX -ge $LEN ]; then
         CURRENT_INDEX=0
     fi
 
@@ -63,22 +63,6 @@ parse_args() {
             ;;
     esac
 
- #   while getopts "npch" arg; do
- #       case ${arg} in
- #           n)
- #               next
- #               ;;
- #           p)
- #               previous
- #               ;;
- #           c)
- #               confirm
- #               ;;
- #           *)
- #               print_help
- #               ;;
- #       esac
- #   done
 }
 
 print_help() {
@@ -94,11 +78,21 @@ switch_to() {
     # bspc -f ^$ID
 }
 
-set_vars() {
-    echo
+update_history() {
+    USED_DESKTOPS=(a b c) # TODO use real bspwm values 
+    NEW=()
+    for history in "${HISTORY[@]}"; do
+        for desktop in "${USED_DESKTOPS[@]}"; do
+            [ "$history" = $desktop ] && NEW+=($history) && break
+        done
+    done
 
+    if [ ${#NEW[@]} -lt 2 ]; then
+        DESKTOPS=(a b c d e) # TODO get real bspwm values
+        NEW=( ${DESKTOPS[0] ${DESKTOPS[1]} )
+    fi
 
-    # TODO update HISTORY when desktops are empty
+    HISTORY=( ${NEW[@]} )
 }
 
 # ::::: START :::::
@@ -138,9 +132,8 @@ export CURRENT_INDEX=$CURRENT_INDEX
 
 #---
 
-#echo "H: ${HISTORY[@]}, I: $CURRENT_INDEX"
+update_history
 parse_args "$@"
-#echo "H: ${HISTORY[@]}, I: $CURRENT_INDEX"
 
 echo "# This file must not be manually edited. If the file is corrupted, please delete it entierly." > $STATE_FILE
 declare -p HISTORY CURRENT_INDEX >> $STATE_FILE
