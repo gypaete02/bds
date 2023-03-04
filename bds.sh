@@ -116,10 +116,8 @@ fi
 
 source $STATE_FILE
 
-# echo "H: ${HISTORY[@]}, I: $CURRENT_INDEX"
-
 if [ -z "$HISTORY" ]; then
-    # TODO make this use real bspwm values
+    # TODO use real bspwm values
     declare -a HISTORY=(a b c d e)
 fi
 
