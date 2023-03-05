@@ -3,8 +3,7 @@
 # Requires bspwm to be installed
 
 check_installation() {
-    # TODO
-    echo ""
+    bspc --version || echo "Bspc is not installed" 1>&2
 }
 
 next() {
@@ -47,7 +46,6 @@ confirm() {
 }
 
 parse_args() {
-
     case $1 in
         next|n)
             next
@@ -62,7 +60,6 @@ parse_args() {
             print_help
             ;;
     esac
-
 }
 
 print_help() {
@@ -80,6 +77,7 @@ switch_to() {
 
 update_history() {
     USED_DESKTOPS=(a b c) # TODO use real bspwm values 
+    # USED_DESKTOPS=( $(bspc query -D -d .occupied) )
     NEW=()
     for history in "${HISTORY[@]}"; do
         for desktop in "${USED_DESKTOPS[@]}"; do
@@ -88,7 +86,8 @@ update_history() {
     done
 
     if [ ${#NEW[@]} -lt 2 ]; then
-        DESKTOPS=(a b c d e) # TODO get real bspwm values
+        DESKTOPS=(a b c d e) # TODO get real bspwm values 
+        # DESKTOPS=( $(bspc query -D) )
         NEW=( ${DESKTOPS[0] ${DESKTOPS[1]} )
     fi
 
@@ -117,8 +116,14 @@ fi
 source $STATE_FILE
 
 if [ -z "$HISTORY" ]; then
+    declare -ax HISTORY=(a b c d e)
+
     # TODO use real bspwm values
-    declare -a HISTORY=(a b c d e)
+#    HISTORY=( $(bspc query -D -d .occupied) )
+#    if [ ${#HISTORY[@]} -lt 2 ]; then
+#        DESKTOPS=( $(bspc query -D) )
+#        HISTORY=( ${DESKTOPS[0] ${DESKTOPS[1]} )
+#    fi
 fi
 
 if [ -z $CURRENT_INDEX ]; then
